@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#c0392b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SVR ERP">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>SVR Med ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #c0392b;
+  --red-light: #e74c3c;
+  --dark: #0f1923;
+  --dark2: #162230;
+  --dark3: #1e2f42;
+  --blue: #2471a3;
+  --green: #1e8449;
+  --orange: #d68910;
+  --purple: #6c3483;
+  --teal: #148f77;
+  --text: #e8edf2;
+  --text2: #8fa3b8;
+  --border: rgba(255,255,255,0.07);
+  --card: rgba(255,255,255,0.04);
+  --radius: 14px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: 'Sarabun', sans-serif;
+  background: var(--dark);
+  color: var(--text);
+  display: flex; flex-direction: column;
+}
+
+/* TOP BAR */
+.topbar {
+  background: var(--dark2);
+  padding: calc(var(--safe-top) + 14px) 16px 14px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  position: relative;
+}
+.topbar-logo {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--red), #8e1a0f);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem; color: white; font-weight: 700;
+  letter-spacing: -0.5px; flex-shrink: 0;
+}
+.topbar-info { flex: 1; }
+.topbar-title { font-size: 1rem; font-weight: 800; color: var(--text); line-height: 1.1; }
+.topbar-sub { font-size: 0.7rem; color: var(--text2); margin-top: 1px; }
+.topbar-badge {
+  background: var(--red); color: white;
+  font-size: 0.65rem; font-weight: 700;
+  padding: 3px 8px; border-radius: 20px;
+}
+
+/* SCROLL AREA */
+.scroll-area {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 14px 14px calc(var(--safe-bottom) + 80px);
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+  display: flex;
+  background: var(--dark2);
+  border-top: 1px solid var(--border);
+  padding: 8px 0 calc(var(--safe-bottom) + 8px);
+  flex-shrink: 0;
+}
+.nav-btn {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 3px; padding: 6px 4px;
+  cursor: pointer; border: none; background: none;
+  color: var(--text2); font-family: 'Sarabun', sans-serif;
+  font-size: 0.62rem; font-weight: 600;
+  transition: color 0.2s;
+}
+.nav-btn.active { color: var(--red-light); }
+.nav-btn .nav-icon { font-size: 1.3rem; line-height: 1; }
+.nav-btn .nav-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--red-light); margin-top: 1px;
+  opacity: 0; transition: opacity 0.2s;
+}
+.nav-btn.active .nav-dot { opacity: 1; }
+
+/* OVERVIEW */
+.overview-header {
+  font-size: 0.72rem; font-weight: 700; color: var(--text2);
+  text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+.kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.kpi-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 12px;
+  position: relative; overflow: hidden;
+}
+.kpi-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px; border-radius: var(--radius) var(--radius) 0 0;
+}
+.kpi-blue::before { background: var(--blue); }
+.kpi-green::before { background: var(--green); }
+.kpi-orange::before { background: var(--orange); }
+.kpi-purple::before { background: var(--purple); }
+.kpi-icon { font-size: 1.4rem; margin-bottom: 6px; }
+.kpi-val { font-family: 'Space Mono', monospace; font-size: 1.5rem; font-weight: 700; line-height: 1; }
+.kpi-label { font-size: 0.7rem; color: var(--text2); margin-top: 4px; }
+.kpi-sub { font-size: 0.65rem; color: var(--text2); margin-top: 2px; }
+
+.total-card {
+  background: linear-gradient(135deg, rgba(192,57,43,0.15), rgba(192,57,43,0.05));
+  border: 1px solid rgba(192,57,43,0.3);
+  border-radius: var(--radius); padding: 16px;
+  margin-bottom: 16px;
+}
+.total-row { display: flex; align-items: center; gap: 12px; }
+.total-pct { font-family: 'Space Mono', monospace; font-size: 2.2rem; font-weight: 700; color: var(--red-light); }
+.total-info { flex: 1; }
+.total-label { font-size: 0.85rem; font-weight: 700; }
+.total-sub { font-size: 0.72rem; color: var(--text2); margin-top: 2px; }
+.prog-bar { background: rgba(255,255,255,0.1); border-radius: 20px; height: 6px; margin-top: 10px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--red), var(--red-light)); transition: width 0.6s cubic-bezier(.4,0,.2,1); }
+
+.sys-prog-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.sys-prog-label { font-size: 0.72rem; min-width: 80px; }
+.sys-prog-bar { flex: 1; background: rgba(255,255,255,0.08); border-radius: 20px; height: 5px; overflow: hidden; }
+.sys-prog-fill { height: 100%; border-radius: 20px; transition: width 0.5s; }
+.sys-prog-pct { font-size: 0.68rem; color: var(--text2); min-width: 28px; text-align: right; }
+
+/* SYSTEM PANELS */
+.section-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); margin-bottom: 10px; overflow: hidden;
+}
+.sec-hdr {
+  display: flex; align-items: center; gap: 10px;
+  padding: 13px 14px; cursor: pointer; user-select: none;
+}
+.sec-hdr-icon { font-size: 1.2rem; }
+.sec-hdr-info { flex: 1; }
+.sec-hdr-title { font-size: 0.9rem; font-weight: 700; }
+.sec-hdr-count { font-size: 0.68rem; color: var(--text2); margin-top: 1px; }
+.sec-hdr-chev { color: var(--text2); font-size: 0.75rem; transition: transform 0.3s; }
+.section-card.open .sec-hdr-chev { transform: rotate(180deg); }
+.sec-body { display: none; border-top: 1px solid var(--border); }
+.section-card.open .sec-body { display: block; }
+
+.task-item {
+  display: flex; align-items: flex-start; gap: 11px;
+  padding: 11px 14px; border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: background 0.15s;
+  -webkit-touch-callout: none;
+}
+.task-item:last-child { border-bottom: none; }
+.task-item:active { background: rgba(255,255,255,0.03); }
+.task-cb {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; color: white; transition: all 0.25s;
+  margin-top: 1px;
+}
+.task-item.done .task-cb { background: #27ae60; border-color: #27ae60; }
+.task-info { flex: 1; min-width: 0; }
+.task-name { font-size: 0.85rem; font-weight: 600; line-height: 1.3; }
+.task-item.done .task-name { text-decoration: line-through; opacity: 0.35; }
+.task-sub { font-size: 0.7rem; color: var(--text2); margin-top: 3px; line-height: 1.4; }
+.task-tag {
+  font-size: 0.6rem; padding: 2px 7px; border-radius: 8px;
+  font-weight: 700; flex-shrink: 0; align-self: flex-start;
+  margin-top: 2px;
+}
+.tt-sheet { background: rgba(30,132,73,0.2); color: #58d68d; }
+.tt-app   { background: rgba(36,113,163,0.2); color: #5dade2; }
+.tt-web   { background: rgba(108,52,131,0.2); color: #a569bd; }
+.tt-line  { background: rgba(20,143,119,0.2); color: #48c9b0; }
+.tt-logic { background: rgba(214,137,16,0.2); color: #f0b429; }
+
+/* INSTALL BANNER */
+.install-banner {
+  background: linear-gradient(135deg, rgba(36,113,163,0.2), rgba(36,113,163,0.05));
+  border: 1px solid rgba(36,113,163,0.3);
+  border-radius: var(--radius); padding: 12px 14px;
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.install-icon { font-size: 1.5rem; }
+.install-info { flex: 1; }
+.install-title { font-size: 0.82rem; font-weight: 700; }
+.install-sub { font-size: 0.68rem; color: var(--text2); margin-top: 2px; }
+.install-btn {
+  background: var(--blue); color: white; border: none;
+  padding: 7px 12px; border-radius: 8px; font-size: 0.72rem;
+  font-weight: 700; cursor: pointer; font-family: 'Sarabun', sans-serif;
+  flex-shrink: 0;
+}
+
+/* FLOW DIAGRAM */
+.flow-wrap {
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px;
+}
+.flow-box {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 8px 10px; text-align: center;
+  font-size: 0.7rem; font-weight: 700; white-space: nowrap;
+  flex-shrink: 0;
+}
+.flow-arr { color: var(--text2); font-size: 0.9rem; flex-shrink: 0; }
+.fb-blue   { border-color: rgba(36,113,163,0.4); color: #5dade2; }
+.fb-green  { border-color: rgba(30,132,73,0.4); color: #58d68d; }
+.fb-orange { border-color: rgba(214,137,16,0.4); color: #f0b429; }
+.fb-purple { border-color: rgba(108,52,131,0.4); color: #a569bd; }
+
+/* PANEL HEADER */
+.panel-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+}
+.panel-color-bar {
+  width: 4px; height: 24px; border-radius: 2px; flex-shrink: 0;
+}
+.panel-title { font-size: 1rem; font-weight: 800; }
+.panel-sub { font-size: 0.72rem; color: var(--text2); margin-top: 1px; }
+
+/* HIDDEN */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* RIPPLE */
+@keyframes ripple { to { transform: scale(4); opacity: 0; } }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">ERP</div>
+  <div class="topbar-info">
+    <div class="topbar-title">SVR Med ERP</div>
+    <div class="topbar-sub">ระบบบริหารจัดการธุรกิจครบวงจร</div>
+  </div>
+  <div class="topbar-badge" id="topBadge">0%</div>
+</div>
+
+<div class="scroll-area" id="scrollArea">
+
+  <!-- OVERVIEW PANEL -->
+  <div class="panel active" id="panel-overview">
+    <div id="installBannerWrap"></div>
+
+    <div class="total-card">
+      <div class="total-row">
+        <div class="total-pct" id="totalPct">0%</div>
+        <div class="total-info">
+          <div class="total-label">ความคืบหน้าโครงการ</div>
+          <div class="total-sub" id="totalSub">0 / 0 tasks เสร็จแล้ว</div>
+        </div>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" id="totalFill" style="width:0%"></div></div>
+    </div>
+
+    <div class="overview-header">ภาพรวมระบบ</div>
+    <div class="kpi-grid" id="kpiGrid"></div>
+
+    <div class="overview-header" style="margin-top:4px">ความคืบหน้าแต่ละระบบ</div>
+    <div id="sysProgs"></div>
+
+    <div class="overview-header" style="margin-top:12px">Data Flow</div>
+    <div class="flow-wrap">
+      <div class="flow-box fb-blue">🏭 Vendor<br>คู่ค้า</div>
+      <div class="flow-arr">→</div>
+      <div class="flow-box fb-green">📦 Inventory<br>คลังสินค้า</div>
+      <div class="flow-arr">→</div>
+      <div class="flow-box fb-orange">🤝 CRM<br>งานขาย</div>
+      <div class="flow-arr">→</div>
+      <div class="flow-box fb-purple">📊 Report<br>+ บัญชี</div>
+    </div>
+  </div>
+
+  <!-- VENDOR PANEL -->
+  <div class="panel" id="panel-vendor">
+    <div class="panel-header">
+      <div class="panel-color-bar" style="background:#2471a3"></div>
+      <div>
+        <div class="panel-title">🏭 Vendor System</div>
+        <div class="panel-sub">ระบบคู่ค้า — ต้นน้ำ</div>
+      </div>
+    </div>
+    <div id="vendor-sections"></div>
+  </div>
+
+  <!-- INVENTORY PANEL -->
+  <div class="panel" id="panel-inventory">
+    <div class="panel-header">
+      <div class="panel-color-bar" style="background:#1e8449"></div>
+      <div>
+        <div class="panel-title">📦 Inventory System</div>
+        <div class="panel-sub">ระบบคลังสินค้า — กลางน้ำ</div>
+      </div>
+    </div>
+    <div id="inventory-sections"></div>
+  </div>
+
+  <!-- CRM PANEL -->
+  <div class="panel" id="panel-crm">
+    <div class="panel-header">
+      <div class="panel-color-bar" style="background:#d68910"></div>
+      <div>
+        <div class="panel-title">🤝 CRM & Report</div>
+        <div class="panel-sub">ระบบขาย + รายงาน — ปลายน้ำ</div>
+      </div>
+    </div>
+    <div id="crm-sections"></div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="switchTab('overview')" id="nav-overview">
+    <span class="nav-icon">📊</span>
+    <span>Overview</span>
+    <div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" onclick="switchTab('vendor')" id="nav-vendor">
+    <span class="nav-icon">🏭</span>
+    <span>Vendor</span>
+    <div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" onclick="switchTab('inventory')" id="nav-inventory">
+    <span class="nav-icon">📦</span>
+    <span>Inventory</span>
+    <div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" onclick="switchTab('crm')" id="nav-crm">
+    <span class="nav-icon">🤝</span>
+    <span>CRM</span>
+    <div class="nav-dot"></div>
+  </button>
+</nav>
+
+<script>
+const DATA = {
+  vendor: {
+    color: '#2471a3', bg: 'rgba(36,113,163,0.1)',
+    sections: [
+      {
+        icon: '🗃️', title: 'Vendor Database (Google Sheets)',
+        items: [
+          { name: 'Sheet: Vendor List', sub: 'ชื่อบริษัท ที่อยู่ เบอร์โทร ผู้ติดต่อ Payment terms', tag: 'tt-sheet', tagLabel: 'Sheets' },
+          { name: 'Sheet: Certificate Database', sub: 'ไฟล์ใบ อย. วันหมดอายุ สินค้าที่เกี่ยวข้อง', tag: 'tt-sheet', tagLabel: 'Sheets' },
+          { name: 'Sheet: Product-Vendor Mapping', sub: 'สินค้าแต่ละตัวซื้อจาก Vendor ไหน ราคาต้นทุน', tag: 'tt-sheet', tagLabel: 'Sheets' },
+        ]
+      },
+      {
+        icon: '📱', title: 'Vendor App (AppSheet)',
+        items: [
+          { name: 'AppSheet: ดูข้อมูล Vendor', sub: 'ค้นหา กรอง แสดงรายละเอียด Vendor', tag: 'tt-app', tagLabel: 'AppSheet' },
+          { name: 'AppSheet: อัปเดต Certificate', sub: 'แจ้งเตือนใบ อย. ใกล้หมดอายุ', tag: 'tt-app', tagLabel: 'AppSheet' },
+          { name: 'AppSheet: Pull Data → Inventory', sub: 'ดึงข้อมูลสินค้าจาก Vendor เข้าระบบคลัง', tag: 'tt-app', tagLabel: 'AppSheet' },
+        ]
+      }
+    ]
+  },
+  inventory: {
+    color: '#1e8449', bg: 'rgba(30,132,73,0.1)',
+    sections: [
+      {
+        icon: '🗃️', title: 'Stock Database (Google Sheets)',
+        items: [
+          { name: 'Sheet: Stock Master', sub: 'รหัสสินค้า ชื่อ หน่วย ราคา จำนวน Min stock', tag: 'tt-sheet', tagLabel: 'Sheets' },
+          { name: 'Sheet: Stock Movement', sub: 'บันทึก In/Out แต่ละครั้ง วันที่ ผู้ทำรายการ', tag: 'tt-sheet', tagLabel: 'Sheets' },
+          { name: 'Sheet: Expiry Tracking', sub: 'วันหมดอายุสินค้าแต่ละ Lot', tag: 'tt-sheet', tagLabel: 'Sheets' },
+        ]
+      },
+      {
+        icon: '📱', title: 'Inventory App (AppSheet)',
+        items: [
+          { name: 'AppSheet: Scan Barcode รับเข้า', sub: 'Admin 1&2 สแกนสินค้าเข้าคลัง', tag: 'tt-app', tagLabel: 'AppSheet' },
+          { name: 'AppSheet: Scan Barcode จ่ายออก', sub: 'Admin 1&2 สแกนสินค้าออกคลัง', tag: 'tt-app', tagLabel: 'AppSheet' },
+          { name: 'Logic: แจ้งเตือน Stock ต่ำ', sub: 'เมื่อ stock < Min → แจ้ง LINE อัตโนมัติ', tag: 'tt-logic', tagLabel: 'Logic' },
+          { name: 'LINE Notify: วันหมดอายุ', sub: 'ส่ง LINE ก่อนหมดอายุ 30/60 วัน', tag: 'tt-line', tagLabel: 'LINE' },
+        ]
+      }
+    ]
+  },
+  crm: {
+    color: '#d68910', bg: 'rgba(214,137,16,0.1)',
+    sections: [
+      {
+        icon: '🗃️', title: 'CRM Database (Google Sheets)',
+        items: [
+          { name: 'Sheet: Customer / ผู้ติดต่อ', sub: 'ชื่อ โรงพยาบาล แผนก ผู้ซื้อ ประวัติ', tag: 'tt-sheet', tagLabel: 'Sheets' },
+          { name: 'Sheet: Sales Pipeline', sub: 'Deal ที่กำลังเจรจา สถานะ มูลค่า ขั้นตอน', tag: 'tt-sheet', tagLabel: 'Sheets' },
+          { name: 'Sheet: Purchase History', sub: 'ประวัติการซื้อ สินค้า จำนวน ราคา วันที่', tag: 'tt-sheet', tagLabel: 'Sheets' },
+          { name: 'Sheet: Accounting Export', sub: 'ข้อมูลส่งให้บัญชี รายรับ-รายจ่าย', tag: 'tt-sheet', tagLabel: 'Sheets' },
+        ]
+      },
+      {
+        icon: '📱', title: 'CRM App (AppSheet)',
+        items: [
+          { name: 'AppSheet: ดู/แก้ไข Customer', sub: 'Owner/Secretary เข้าถึงข้อมูลลูกค้า', tag: 'tt-app', tagLabel: 'AppSheet' },
+          { name: 'AppSheet: อัปเดต Sales Pipeline', sub: 'เปลี่ยนสถานะ Deal / Close Deal', tag: 'tt-app', tagLabel: 'AppSheet' },
+          { name: 'AppSheet: Select Products for Proposal', sub: 'เลือกสินค้าจาก Stock เพื่อเสนอราคา', tag: 'tt-app', tagLabel: 'AppSheet' },
+        ]
+      },
+      {
+        icon: '📊', title: 'Report & Automation',
+        items: [
+          { name: 'Monthly Sales Report', sub: 'สรุปยอดขายต่อเดือน แยกสินค้า ลูกค้า', tag: 'tt-sheet', tagLabel: 'Sheets' },
+          { name: 'Auto: ส่งข้อมูลบัญชี', sub: 'Export Accounting Data ส่ง Email/LINE', tag: 'tt-logic', tagLabel: 'Logic' },
+          { name: 'Web Dashboard: ภาพรวม ERP', sub: 'หน้า Web แสดง KPI Stock Sales ทั้งระบบ', tag: 'tt-web', tagLabel: 'Web' },
+        ]
+      }
+    ]
+  }
+};
+
+// STATE
+let state = {};
+try { state = JSON.parse(localStorage.getItem('svr_pwa_v1') || '{}'); } catch(e) {}
+
+function stateKey(sys, si, ii) { return `${sys}-${si}-${ii}`; }
+
+function initState() {
+  Object.keys(DATA).forEach(sys => {
+    DATA[sys].sections.forEach((sec, si) => {
+      sec.items.forEach((_, ii) => {
+        const k = stateKey(sys, si, ii);
+        if (!(k in state)) state[k] = false;
+      });
+    });
+  });
+}
+
+function saveState() {
+  try { localStorage.setItem('svr_pwa_v1', JSON.stringify(state)); } catch(e) {}
+}
+
+function getProgress(sys) {
+  let total = 0, done = 0;
+  DATA[sys].sections.forEach((sec, si) => {
+    sec.items.forEach((_, ii) => {
+      total++;
+      if (state[stateKey(sys, si, ii)]) done++;
+    });
+  });
+  return { total, done, pct: total ? Math.round(done / total * 100) : 0 };
+}
+
+function getTotalProgress() {
+  let total = 0, done = 0;
+  Object.keys(DATA).forEach(sys => {
+    const p = getProgress(sys);
+    total += p.total; done += p.done;
+  });
+  return { total, done, pct: total ? Math.round(done / total * 100) : 0 };
+}
+
+// RENDER
+function renderOverview() {
+  const tot = getTotalProgress();
+  document.getElementById('totalPct').textContent = tot.pct + '%';
+  document.getElementById('totalSub').textContent = `${tot.done} / ${tot.total} tasks เสร็จแล้ว`;
+  document.getElementById('totalFill').style.width = tot.pct + '%';
+  document.getElementById('topBadge').textContent = tot.pct + '%';
+
+  const sysInfo = [
+    { key: 'vendor',    icon: '🏭', label: 'Vendor',    cls: 'kpi-blue',   color: '#2471a3' },
+    { key: 'inventory', icon: '📦', label: 'Inventory', cls: 'kpi-green',  color: '#1e8449' },
+    { key: 'crm',       icon: '🤝', label: 'CRM',       cls: 'kpi-orange', color: '#d68910' },
+  ];
+
+  const totCard = `<div class="kpi-card kpi-purple">
+    <div class="kpi-icon">📊</div>
+    <div class="kpi-val" style="color:#a569bd">${tot.pct}%</div>
+    <div class="kpi-label">ภาพรวม</div>
+    <div class="kpi-sub">${tot.done}/${tot.total} tasks</div>
+  </div>`;
+
+  let kpiHtml = '';
+  sysInfo.forEach(s => {
+    const p = getProgress(s.key);
+    kpiHtml += `<div class="kpi-card ${s.cls}" onclick="switchTab('${s.key}')">
+      <div class="kpi-icon">${s.icon}</div>
+      <div class="kpi-val" style="color:${s.color}">${p.pct}%</div>
+      <div class="kpi-label">${s.label}</div>
+      <div class="kpi-sub">${p.done}/${p.total} tasks</div>
+    </div>`;
+  });
+  document.getElementById('kpiGrid').innerHTML = kpiHtml + totCard;
+
+  let progsHtml = '';
+  sysInfo.forEach(s => {
+    const p = getProgress(s.key);
+    progsHtml += `<div class="sys-prog-row">
+      <div class="sys-prog-label">${s.icon} ${s.label}</div>
+      <div class="sys-prog-bar"><div class="sys-prog-fill" style="width:${p.pct}%;background:${s.color}"></div></div>
+      <div class="sys-prog-pct">${p.pct}%</div>
+    </div>`;
+  });
+  document.getElementById('sysProgs').innerHTML = progsHtml;
+}
+
+function renderSections(sys, containerId) {
+  const container = document.getElementById(containerId);
+  const sysData = DATA[sys];
+  let html = '';
+  sysData.sections.forEach((sec, si) => {
+    const doneCount = sec.items.filter((_, ii) => state[stateKey(sys, si, ii)]).length;
+    html += `<div class="section-card open" id="sec-${sys}-${si}">
+      <div class="sec-hdr" onclick="toggleSec('${sys}',${si})">
+        <span class="sec-hdr-icon">${sec.icon}</span>
+        <div class="sec-hdr-info">
+          <div class="sec-hdr-title">${sec.title}</div>
+          <div class="sec-hdr-count">${doneCount}/${sec.items.length} เสร็จแล้ว</div>
+        </div>
+        <span class="sec-hdr-chev">▼</span>
+      </div>
+      <div class="sec-body">
+        ${sec.items.map((item, ii) => {
+          const k = stateKey(sys, si, ii);
+          const done = state[k];
+          return `<div class="task-item ${done ? 'done' : ''}" onclick="toggleTask('${sys}',${si},${ii})">
+            <div class="task-cb">${done ? '✓' : ''}</div>
+            <div class="task-info">
+              <div class="task-name">${item.name}</div>
+              <div class="task-sub">${item.sub}</div>
+            </div>
+            <span class="task-tag ${item.tag}">${item.tagLabel}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function toggleSec(sys, si) {
+  const el = document.getElementById(`sec-${sys}-${si}`);
+  if (el) el.classList.toggle('open');
+}
+
+function toggleTask(sys, si, ii) {
+  const k = stateKey(sys, si, ii);
+  state[k] = !state[k];
+  saveState();
+  renderAll();
+  // keep current tab open & section open
+  const el = document.getElementById(`sec-${sys}-${si}`);
+  if (el) el.classList.add('open');
+}
+
+function renderAll() {
+  renderOverview();
+  renderSections('vendor', 'vendor-sections');
+  renderSections('inventory', 'inventory-sections');
+  renderSections('crm', 'crm-sections');
+}
+
+// TAB SWITCHING
+let currentTab = 'overview';
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.panel').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  document.getElementById('nav-' + tab).classList.add('active');
+  document.getElementById('scrollArea').scrollTop = 0;
+}
+
+// PWA INSTALL
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBannerWrap').innerHTML = `
+    <div class="install-banner">
+      <div class="install-icon">📲</div>
+      <div class="install-info">
+        <div class="install-title">ติดตั้งเป็น App บนมือถือ</div>
+        <div class="install-sub">ใช้งานได้แม้ไม่มี internet · เหมือน App จริง</div>
+      </div>
+      <button class="install-btn" onclick="installPWA()">ติดตั้ง</button>
+    </div>`;
+});
+
+function installPWA() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      document.getElementById('installBannerWrap').innerHTML = '';
+    });
+  }
+}
+
+// SERVICE WORKER
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+
+// INIT
+initState();
+renderAll();
+</script>
+</body>
+</html>
